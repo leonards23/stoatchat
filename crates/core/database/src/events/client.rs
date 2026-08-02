@@ -1,4 +1,4 @@
-use authifier::AuthifierEvent;
+use iso8601_timestamp::Timestamp;
 use revolt_result::Error;
 use serde::{Deserialize, Serialize};
 
@@ -11,7 +11,7 @@ use revolt_models::v0::{
     UserVoiceState, Webhook,
 };
 
-use crate::{Database, amqp::get_amqp};
+use crate::{amqp::get_amqp, Account, Database, Session};
 
 /// Ping Packet
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -331,7 +331,20 @@ pub enum EventV1 {
     },
 
     /// Auth events
-    Auth(AuthifierEvent),
+    CreateAccount {
+        account: Account,
+    },
+    CreateSession {
+        session: Session,
+    },
+    DeleteSession {
+        user_id: String,
+        session_id: String,
+    },
+    DeleteAllSessions {
+        user_id: String,
+        exclude_session_id: Option<String>,
+    },
 
     /// Voice events
     VoiceChannelJoin {
@@ -362,6 +375,12 @@ pub enum EventV1 {
     /// User's active slowmodes
     UserSlowmodes {
         slowmodes: Vec<ChannelSlowmode>,
+    },
+    VoiceCallUpdate {
+        initiator_id: String,
+        channel_id: String,
+        started_at: Option<Timestamp>,
+        ended: bool,
     },
 }
 

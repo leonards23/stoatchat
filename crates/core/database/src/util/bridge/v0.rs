@@ -319,6 +319,7 @@ impl From<FieldsChannel> for crate::FieldsChannel {
             FieldsChannel::Icon => crate::FieldsChannel::Icon,
             FieldsChannel::DefaultPermissions => crate::FieldsChannel::DefaultPermissions,
             FieldsChannel::Voice => crate::FieldsChannel::Voice,
+            FieldsChannel::Slowmode => crate::FieldsChannel::Slowmode,
         }
     }
 }
@@ -330,6 +331,7 @@ impl From<crate::FieldsChannel> for FieldsChannel {
             crate::FieldsChannel::Icon => FieldsChannel::Icon,
             crate::FieldsChannel::DefaultPermissions => FieldsChannel::DefaultPermissions,
             crate::FieldsChannel::Voice => FieldsChannel::Voice,
+            crate::FieldsChannel::Slowmode => FieldsChannel::Slowmode,
         }
     }
 }
@@ -631,6 +633,7 @@ impl From<crate::Member> for Member {
             id: value.id.into(),
             joined_at: value.joined_at,
             nickname: value.nickname,
+            pronouns: value.pronouns,
             avatar: value.avatar.map(|f| f.into()),
             roles: value.roles,
             timeout: value.timeout,
@@ -646,6 +649,7 @@ impl From<Member> for crate::Member {
             id: value.id.into(),
             joined_at: value.joined_at,
             nickname: value.nickname,
+            pronouns: value.pronouns,
             avatar: value.avatar.map(|f| f.into()),
             roles: value.roles,
             timeout: value.timeout,
@@ -661,6 +665,7 @@ impl From<crate::PartialMember> for PartialMember {
             id: value.id.map(|id| id.into()),
             joined_at: value.joined_at,
             nickname: value.nickname,
+            pronouns: value.pronouns,
             avatar: value.avatar.map(|f| f.into()),
             roles: value.roles,
             timeout: value.timeout,
@@ -676,6 +681,7 @@ impl From<PartialMember> for crate::PartialMember {
             id: value.id.map(|id| id.into()),
             joined_at: value.joined_at,
             nickname: value.nickname,
+            pronouns: value.pronouns,
             avatar: value.avatar.map(|f| f.into()),
             roles: value.roles,
             timeout: value.timeout,
@@ -708,6 +714,7 @@ impl From<crate::FieldsMember> for FieldsMember {
         match value {
             crate::FieldsMember::Avatar => FieldsMember::Avatar,
             crate::FieldsMember::Nickname => FieldsMember::Nickname,
+            crate::FieldsMember::Pronouns => FieldsMember::Pronouns,
             crate::FieldsMember::Roles => FieldsMember::Roles,
             crate::FieldsMember::Timeout => FieldsMember::Timeout,
             crate::FieldsMember::CanReceive => FieldsMember::CanReceive,
@@ -723,6 +730,7 @@ impl From<FieldsMember> for crate::FieldsMember {
         match value {
             FieldsMember::Avatar => crate::FieldsMember::Avatar,
             FieldsMember::Nickname => crate::FieldsMember::Nickname,
+            FieldsMember::Pronouns => crate::FieldsMember::Pronouns,
             FieldsMember::Roles => crate::FieldsMember::Roles,
             FieldsMember::Timeout => crate::FieldsMember::Timeout,
             FieldsMember::CanReceive => crate::FieldsMember::CanReceive,
@@ -1032,6 +1040,7 @@ impl crate::User {
             username: self.username,
             discriminator: self.discriminator,
             display_name: self.display_name,
+            pronouns: self.pronouns,
             avatar: self.avatar.map(|file| file.into()),
             relations: if let Some(crate::User { id, .. }) = perspective {
                 if id == &self.id {
@@ -1108,6 +1117,7 @@ impl crate::User {
             username: self.username,
             discriminator: self.discriminator,
             display_name: self.display_name,
+            pronouns: self.pronouns,
             avatar: self.avatar.map(|file| file.into()),
             relations: vec![],
             badges,
@@ -1141,6 +1151,7 @@ impl crate::User {
             username: self.username,
             discriminator: self.discriminator,
             display_name: self.display_name,
+            pronouns: self.pronouns,
             avatar: self.avatar.map(|file| file.into()),
             relations: vec![],
             badges,
@@ -1168,6 +1179,7 @@ impl crate::User {
             username: self.username,
             discriminator: self.discriminator,
             display_name: self.display_name,
+            pronouns: self.pronouns,
             avatar: self.avatar.map(|file| file.into()),
             relations: self
                 .relations
@@ -1211,6 +1223,7 @@ impl From<User> for crate::User {
             username: value.username,
             discriminator: value.discriminator,
             display_name: value.display_name,
+            pronouns: value.pronouns,
             avatar: value.avatar.map(Into::into),
             relations: None,
             badges: Some(value.badges as i32),
@@ -1231,6 +1244,7 @@ impl From<crate::PartialUser> for PartialUser {
             username: value.username,
             discriminator: value.discriminator,
             display_name: value.display_name,
+            pronouns: value.pronouns,
             avatar: value.avatar.map(|file| file.into()),
             relations: value.relations.map(|relationships| {
                 relationships
@@ -1259,6 +1273,7 @@ impl From<FieldsUser> for crate::FieldsUser {
             FieldsUser::StatusPresence => crate::FieldsUser::StatusPresence,
             FieldsUser::StatusText => crate::FieldsUser::StatusText,
             FieldsUser::DisplayName => crate::FieldsUser::DisplayName,
+            FieldsUser::Pronouns => crate::FieldsUser::Pronouns,
 
             FieldsUser::Internal => crate::FieldsUser::None,
         }
@@ -1274,6 +1289,7 @@ impl From<crate::FieldsUser> for FieldsUser {
             crate::FieldsUser::StatusPresence => FieldsUser::StatusPresence,
             crate::FieldsUser::StatusText => FieldsUser::StatusText,
             crate::FieldsUser::DisplayName => FieldsUser::DisplayName,
+            crate::FieldsUser::Pronouns => FieldsUser::Pronouns,
 
             crate::FieldsUser::Suspension => FieldsUser::Internal,
             crate::FieldsUser::None => FieldsUser::Internal,
@@ -1407,6 +1423,14 @@ impl From<FieldsMessage> for crate::FieldsMessage {
     }
 }
 
+impl From<crate::VoiceInformation> for VoiceInformation {
+    fn from(value: crate::VoiceInformation) -> Self {
+        VoiceInformation {
+            max_users: value.max_users,
+        }
+    }
+}
+
 impl From<VoiceInformation> for crate::VoiceInformation {
     fn from(value: VoiceInformation) -> Self {
         crate::VoiceInformation {
@@ -1415,10 +1439,246 @@ impl From<VoiceInformation> for crate::VoiceInformation {
     }
 }
 
-impl From<crate::VoiceInformation> for VoiceInformation {
-    fn from(value: crate::VoiceInformation) -> Self {
-        VoiceInformation {
-            max_users: value.max_users,
+impl From<crate::AuditLogEntryAction> for AuditLogEntryAction {
+    fn from(value: crate::AuditLogEntryAction) -> Self {
+        match value {
+            crate::AuditLogEntryAction::MessageDelete { author, channel } => {
+                AuditLogEntryAction::MessageDelete { author, channel }
+            }
+            crate::AuditLogEntryAction::BanCreate { user } => {
+                AuditLogEntryAction::BanCreate { user }
+            }
+            crate::AuditLogEntryAction::BanDelete { user } => {
+                AuditLogEntryAction::BanDelete { user }
+            }
+            crate::AuditLogEntryAction::ChannelCreate { channel, name } => {
+                AuditLogEntryAction::ChannelCreate { channel, name }
+            }
+            crate::AuditLogEntryAction::MemberEdit {
+                user,
+                before,
+                after,
+            } => AuditLogEntryAction::MemberEdit {
+                user,
+                before: before.into(),
+                after: after.into(),
+            },
+            crate::AuditLogEntryAction::MemberKick { user } => {
+                AuditLogEntryAction::MemberKick { user }
+            }
+            crate::AuditLogEntryAction::ServerEdit { before, after } => {
+                AuditLogEntryAction::ServerEdit {
+                    before: before.into(),
+                    after: after.into(),
+                }
+            }
+            crate::AuditLogEntryAction::RoleEdit {
+                role,
+                before,
+                after,
+            } => AuditLogEntryAction::RoleEdit {
+                role,
+                before: before.into(),
+                after: after.into(),
+            },
+            crate::AuditLogEntryAction::RoleCreate { role, name } => {
+                AuditLogEntryAction::RoleCreate { role, name }
+            }
+            crate::AuditLogEntryAction::RoleDelete { role, name } => {
+                AuditLogEntryAction::RoleDelete { role, name }
+            }
+            crate::AuditLogEntryAction::RolesReorder { before, after } => {
+                AuditLogEntryAction::RolesReorder { before, after }
+            }
+            crate::AuditLogEntryAction::MessageBulkDelete { channel, count } => {
+                AuditLogEntryAction::MessageBulkDelete { channel, count }
+            }
+            crate::AuditLogEntryAction::ChannelEdit {
+                channel,
+                before,
+                after,
+            } => AuditLogEntryAction::ChannelEdit {
+                channel,
+                before: before.into(),
+                after: after.into(),
+            },
+            crate::AuditLogEntryAction::ChannelRolePermissionsEdit {
+                channel,
+                role,
+                permissions,
+            } => AuditLogEntryAction::ChannelRolePermissionsEdit {
+                channel,
+                role,
+                permissions: permissions.into(),
+            },
+            crate::AuditLogEntryAction::ChannelDelete { channel, name } => {
+                AuditLogEntryAction::ChannelDelete { channel, name }
+            }
+            crate::AuditLogEntryAction::InviteDelete { invite, channel } => {
+                AuditLogEntryAction::InviteDelete { invite, channel }
+            }
+            crate::AuditLogEntryAction::WebhookCreate {
+                webhook,
+                name,
+                channel,
+            } => AuditLogEntryAction::WebhookCreate {
+                webhook,
+                name,
+                channel,
+            },
+            crate::AuditLogEntryAction::WebhookDelete {
+                webhook,
+                name,
+                channel,
+            } => AuditLogEntryAction::WebhookDelete {
+                webhook,
+                name,
+                channel,
+            },
+            crate::AuditLogEntryAction::EmojiCreate { emoji, name } => {
+                AuditLogEntryAction::EmojiCreate { emoji, name }
+            }
+            crate::AuditLogEntryAction::EmojiUpdate {
+                emoji,
+                before,
+                after,
+            } => AuditLogEntryAction::EmojiUpdate {
+                emoji,
+                before: before.into(),
+                after: after.into(),
+            },
+            crate::AuditLogEntryAction::EmojiDelete { emoji, name } => {
+                AuditLogEntryAction::EmojiDelete { emoji, name }
+            }
+            crate::AuditLogEntryAction::MessagePin {
+                message,
+                author,
+                channel,
+            } => AuditLogEntryAction::MessagePin {
+                message,
+                author,
+                channel,
+            },
+            crate::AuditLogEntryAction::MessageUnpin {
+                message,
+                author,
+                channel,
+            } => AuditLogEntryAction::MessageUnpin {
+                message,
+                author,
+                channel,
+            },
+            crate::AuditLogEntryAction::InviteCreate { invite, channel } => {
+                AuditLogEntryAction::InviteCreate { invite, channel }
+            }
         }
+    }
+}
+
+impl From<crate::AuditLogEntry> for AuditLogEntry {
+    fn from(value: crate::AuditLogEntry) -> Self {
+        AuditLogEntry {
+            id: value.id,
+            server: value.server,
+            reason: value.reason,
+            user: value.user,
+            target: value.target,
+            action: value.action.into(),
+        }
+    }
+}
+
+impl From<crate::Account> for AccountInfo {
+    fn from(item: crate::Account) -> Self {
+        AccountInfo {
+            id: item.id,
+            email: item.email,
+        }
+    }
+}
+
+impl From<crate::MFATicket> for MFATicket {
+    fn from(value: crate::MFATicket) -> Self {
+        MFATicket {
+            id: value.id,
+            account_id: value.account_id,
+            token: value.token,
+            validated: value.validated,
+            authorised: value.authorised,
+            last_totp_code: value.last_totp_code,
+        }
+    }
+}
+
+impl From<crate::MultiFactorAuthentication> for MultiFactorStatus {
+    fn from(item: crate::MultiFactorAuthentication) -> Self {
+        MultiFactorStatus {
+            // email_otp: item.enable_email_otp,
+            // trusted_handover: item.enable_trusted_handover,
+            // email_mfa: item.enable_email_mfa,
+            totp_mfa: !item.totp_token.is_disabled(),
+            // security_key_mfa: item.security_key_token.is_some(),
+            recovery_active: !item.recovery_codes.is_empty(),
+            ..Default::default()
+        }
+    }
+}
+
+impl From<crate::MFAMethod> for MFAMethod {
+    fn from(value: crate::MFAMethod) -> Self {
+        match value {
+            crate::MFAMethod::Password => MFAMethod::Password,
+            crate::MFAMethod::Recovery => MFAMethod::Recovery,
+            crate::MFAMethod::Totp => MFAMethod::Totp,
+        }
+    }
+}
+
+impl From<crate::Session> for SessionInfo {
+    fn from(item: crate::Session) -> Self {
+        SessionInfo {
+            id: item.id,
+            name: item.name,
+        }
+    }
+}
+
+impl From<crate::Session> for Session {
+    fn from(value: crate::Session) -> Self {
+        Session {
+            id: value.id,
+            user_id: value.user_id,
+            token: value.token,
+            name: value.name,
+            last_seen: value.last_seen,
+            origin: value.origin,
+            subscription: value.subscription.map(Into::into),
+        }
+    }
+}
+
+impl From<crate::WebPushSubscription> for WebPushSubscription {
+    fn from(value: crate::WebPushSubscription) -> Self {
+        WebPushSubscription {
+            endpoint: value.endpoint,
+            p256dh: value.p256dh,
+            auth: value.auth,
+        }
+    }
+}
+
+impl From<WebPushSubscription> for crate::WebPushSubscription {
+    fn from(value: WebPushSubscription) -> Self {
+        crate::WebPushSubscription {
+            endpoint: value.endpoint,
+            p256dh: value.p256dh,
+            auth: value.auth,
+        }
+    }
+}
+
+impl From<crate::PartialEmoji> for PartialEmoji {
+    fn from(value: crate::PartialEmoji) -> Self {
+        PartialEmoji { name: value.name }
     }
 }

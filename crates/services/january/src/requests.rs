@@ -419,21 +419,22 @@ impl Request {
     }
 
     pub async fn url_is_blacklisted(url: &Url) -> Result<IPRequest> {
-        let resolved_address: IpAddr;
+        let mut resolved_address: Option<IpAddr> = None;
 
         if let Some(host) = url.host() {
             match host {
                 Host::Ipv4(ipv4) => {
-                    resolved_address = ipv4.into();
                     if !IP_BLOCKLIST.is_allowed(&ipv4.to_string()) {
                         return Err(create_error!(InvalidOperation));
                     }
+                    resolved_address = Some(ipv4.into());
                 }
                 Host::Ipv6(ipv6) => {
-                    resolved_address = ipv6.into();
-                    if !IP_BLOCKLIST.is_allowed(&ipv6.to_string()) {
+                    let string = ipv6.to_string();
+                    if string.contains("::ffff:") || !IP_BLOCKLIST.is_allowed(&string) {
                         return Err(create_error!(InvalidOperation));
                     }
+                    resolved_address = Some(ipv6.into());
                 }
                 Host::Domain(domain) => {
                     let domain = domain.to_string();
@@ -449,7 +450,7 @@ impl Request {
 
                     // Second step: resolve the IP and check the blocklist
                     let resolver = CachedDnsResolver {};
-                    if let Ok(mut resolved_ip) = resolver
+                    if let Ok(resolved_ips) = resolver
                         .resolve(
                             Name::from_str(&domain)
                                 .map_err(|_| create_error!(ProxyError))
@@ -457,16 +458,14 @@ impl Request {
                         )
                         .await
                     {
-                        if let Some(resolved_ip) = resolved_ip.next() {
-                            resolved_address = resolved_ip.ip();
-                            let resolved_string = resolved_address.to_string();
+                        for resolved in resolved_ips {
+                            resolved_address = Some(resolved.ip()); // last resolved ip will be the one we hit as a consequence of this for loop.
+                            let resolved_string = resolved_address.unwrap().to_string();
                             if !IP_BLOCKLIST.is_allowed(&resolved_string)
                                 || resolved_string.contains("::ffff:")
                             {
                                 return Err(create_error!(InvalidOperation));
                             }
-                        } else {
-                            return Err(create_error!(InvalidOperation));
                         }
                     } else {
                         return Err(create_error!(ProxyError));
@@ -477,9 +476,13 @@ impl Request {
             return Err(create_error!(ProxyError));
         };
 
+        if resolved_address.is_none() {
+            return Err(create_error!(InvalidOperation));
+        }
+
         Ok(IPRequest {
             url: url.clone(),
-            ip: resolved_address,
+            ip: resolved_address.unwrap(),
             blocked: false,
         })
     }

@@ -1,6 +1,6 @@
 [package]
 name = "revolt-crond"
-version = "0.13.7"
+version = "0.14.3"
 license = "AGPL-3.0-or-later"
 authors = ["Paul Makles <me@insrt.uk>"]
 edition = "2021"
@@ -15,9 +15,10 @@ log = { workspace = true }
 
 # Async
 tokio = { workspace = true }
+futures = { workspace = true }
 
 # Redis
-redis-kiss = { workspace = true }
+redis-kiss = { workspace = true, default-features = false, features = ["tokio-runtime"] }
 
 # RabbitMQ
 lapin = { workspace = true }

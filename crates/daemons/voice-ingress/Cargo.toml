@@ -1,6 +1,6 @@
 [package]
 name = "revolt-voice-ingress"
-version = "0.13.7"
+version = "0.14.3"
 license = "AGPL-3.0-or-later"
 edition = "2021"
 publish = false
@@ -13,7 +13,7 @@ log = { workspace = true }
 sentry = { workspace = true }
 lru = { workspace = true }
 ulid = { workspace = true }
-redis-kiss = { workspace = true }
+redis-kiss = { workspace = true, default-features = false, features = ["tokio-runtime"] }
 chrono = { workspace = true }
 
 # Serde
@@ -27,11 +27,6 @@ rocket_empty = { workspace = true }
 
 # Async
 futures = { workspace = true }
-async-std = { workspace = true, features = [
-    "tokio1",
-    "tokio02",
-    "attributes",
-] }
 
 # Core
 revolt-result = { workspace = true, features = ["rocket"] }

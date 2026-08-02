@@ -43,6 +43,17 @@ impl AbstractServers for MongoDb {
             .await)
     }
 
+    async fn fetch_owned_servers(&self, user_id: &str) -> Result<Vec<Server>> {
+        query!(
+            self,
+            find,
+            COL,
+            doc! {
+                "owner": user_id
+            }
+        )
+    }
+
     /// Update a server with new information
     async fn update_server(
         &self,
@@ -247,6 +258,13 @@ impl MongoDb {
             "used_for.id": &server_id
         })
         .await?;
+
+        self.col::<Document>("audit_logs")
+            .delete_many(doc! {
+                "server": &server_id
+            })
+            .await
+            .map_err(|_| create_database_error!("delete_many", "audit_logs"))?;
 
         Ok(())
     }

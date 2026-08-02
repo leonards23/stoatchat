@@ -1,4 +1,5 @@
 mod admin_migrations;
+mod audit_logs;
 mod bots;
 mod channel_invites;
 mod channel_unreads;
@@ -17,8 +18,13 @@ mod server_members;
 mod servers;
 mod user_settings;
 mod users;
+mod accounts;
+mod account_invites;
+mod sessions;
+mod mfa_tickets;
 
 pub use admin_migrations::*;
+pub use audit_logs::*;
 pub use bots::*;
 pub use channel_invites::*;
 pub use channel_unreads::*;
@@ -37,6 +43,10 @@ pub use server_members::*;
 pub use servers::*;
 pub use user_settings::*;
 pub use users::*;
+pub use accounts::*;
+pub use account_invites::*;
+pub use sessions::*;
+pub use mfa_tickets::*;
 
 use crate::{Database, ReferenceDb};
 
@@ -47,6 +57,7 @@ pub trait AbstractDatabase:
     Sync
     + Send
     + admin_migrations::AbstractMigrations
+    + audit_logs::AbstractAuditLogs
     + bots::AbstractBots
     + channels::AbstractChannels
     + channel_invites::AbstractChannelInvites
@@ -65,6 +76,10 @@ pub trait AbstractDatabase:
     + servers::AbstractServers
     + user_settings::AbstractUserSettings
     + users::AbstractUsers
+    + accounts::AbstractAccounts
+    + account_invites::AbstractAccountInvites
+    + sessions::AbstractSessions
+    + mfa_tickets::AbstractMFATickets
 {
 }
 

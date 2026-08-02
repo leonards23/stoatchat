@@ -1,5 +1,6 @@
 production = false
 disable_events_dont_use = false
+environment = "dev"
 
 [database]
 # MongoDB connection URL
@@ -54,6 +55,10 @@ from_address = "noreply@example.com"
 # port = 587
 # use_tls = true
 
+[api.smtp.expiry]
+expire_verification = 604800  # 3600 * 24 * 7
+expire_password_reset = 86400  # 3600 * 24
+expire_account_deletion = 86400  # 3600 * 24
 
 [api.security]
 # Authifier Shield API key
@@ -72,6 +77,10 @@ tenor_key = ""
 hcaptcha_key = ""
 hcaptcha_sitekey = ""
 
+[api.security.shield]
+host = ""
+key = ""
+
 [api.workers]
 # Maximum concurrent connections (to proxy server)
 max_concurrent_connections = 50
@@ -79,6 +88,10 @@ max_concurrent_connections = 50
 [api.livekit]
 # How long to ring devices for when calling in dms/groups, in seconds
 call_ring_duration = 30
+
+[api.audit_logs]
+# How long audit log entries last before being removed, in seconds
+expires_after = 2592000  # 30d
 
 [api.livekit.nodes]
 
@@ -321,6 +334,9 @@ emojis = 500_000
 # The max amount of messages the rabbitmq provider/db mention adder job will delay for before forcing handling of a channel.
 # default: 5
 process_message_delay_limit = 5
+# How many event ids to cache per bonfire connections.
+# Higher numbers result in more deduplication but more ram usage.
+seen_events_cache_size = 2048
 
 [features.legal_links]
 # URLs for legal documents
