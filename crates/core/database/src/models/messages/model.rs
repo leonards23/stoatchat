@@ -1060,11 +1060,12 @@ impl Message {
 
     /// Delete a message
     pub async fn delete(&self, db: &Database, amqp: Option<&AMQP>) -> Result<()> {
-        let file_ids: Vec<String> = self
+        let file_ids = self
             .attachments
-            .as_ref()
-            .map(|files| files.iter().map(|file| file.id.to_string()).collect())
-            .unwrap_or_default();
+            .iter()
+            .flatten()
+            .map(|file| file.id.clone())
+            .collect::<Vec<_>>();
 
         if !file_ids.is_empty() {
             db.mark_attachments_as_deleted(&file_ids).await?;

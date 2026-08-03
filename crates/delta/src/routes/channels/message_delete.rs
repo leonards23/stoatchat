@@ -1,10 +1,13 @@
 use revolt_database::{
-    AMQP, Database, User, util::{permissions::DatabasePermissionQuery, reference::Reference}
+    util::{permissions::DatabasePermissionQuery, reference::Reference},
+    AuditLogEntryAction, Database, User, AMQP
 };
 use revolt_permissions::{calculate_channel_permissions, ChannelPermission};
 use revolt_result::Result;
 use rocket::State;
 use rocket_empty::EmptyResponse;
+
+use crate::util::audit_log_reason::AuditLogReason;
 
 /// # Delete Message
 ///
@@ -15,18 +18,40 @@ pub async fn delete(
     db: &State<Database>,
     amqp: &State<AMQP>,
     user: User,
+    reason: AuditLogReason,
     target: Reference<'_>,
     msg: Reference<'_>,
 ) -> Result<EmptyResponse> {
     let message = msg.as_message_in_channel(db, target.id).await?;
 
-    if message.author != user.id {
+    let channel = if message.author != user.id {
         let channel = target.as_channel(db).await?;
         let mut query = DatabasePermissionQuery::new(db, &user).channel(&channel);
         calculate_channel_permissions(&mut query)
             .await
             .throw_if_lacking_channel_permission(ChannelPermission::ManageMessages)?;
-    }
 
-    message.delete(db, Some(amqp)).await.map(|_| EmptyResponse)
+        Some(channel)
+    } else {
+        None
+    };
+
+    message.delete(db, Some(amqp)).await?;
+
+    if let Some(server) = channel.and_then(|c| c.server().map(|s| s.to_string())) {
+        AuditLogEntryAction::MessageDelete {
+            author: message.author.clone(),
+            channel: message.channel.clone(),
+        }
+        .insert(
+            db,
+            server.to_string(),
+            reason,
+            user.id.clone(),
+            Some(message.author),
+        )
+        .await;
+    };
+
+    Ok(EmptyResponse)
 }

@@ -1,3 +1,4 @@
+use iso8601_timestamp::Timestamp;
 use revolt_result::Error;
 use serde::{Deserialize, Serialize};
 
@@ -95,6 +96,10 @@ pub enum EventV1 {
     Pong {
         data: Ping,
     },
+
+    /// Release the bees.
+    Bees,
+
     /// New message
     Message(Message),
 
@@ -372,6 +377,12 @@ pub enum EventV1 {
     /// User's active slowmodes
     UserSlowmodes {
         slowmodes: Vec<ChannelSlowmode>,
+    },
+    VoiceCallUpdate {
+        initiator_id: String,
+        channel_id: String,
+        started_at: Option<Timestamp>,
+        ended: bool,
     },
 }
 

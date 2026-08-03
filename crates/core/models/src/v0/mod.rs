@@ -1,3 +1,4 @@
+mod audit_logs;
 mod bots;
 mod channel_invites;
 mod channel_unreads;
@@ -19,6 +20,7 @@ mod accounts;
 mod mfa_tickets;
 mod sessions;
 
+pub use audit_logs::*;
 pub use bots::*;
 pub use channel_invites::*;
 pub use channel_unreads::*;

@@ -261,6 +261,12 @@ pub struct ApiUsers {
 }
 
 #[derive(Deserialize, Debug, Clone)]
+pub struct ApiAuditLogs {
+    /// How long audit log entries last before being removed, in seconds
+    pub expires_after: u64,
+}
+
+#[derive(Deserialize, Debug, Clone)]
 pub struct Api {
     pub registration: ApiRegistration,
     pub smtp: ApiSmtp,
@@ -268,6 +274,7 @@ pub struct Api {
     pub workers: ApiWorkers,
     pub livekit: ApiLiveKit,
     pub users: ApiUsers,
+    pub audit_logs: ApiAuditLogs,
 }
 
 #[derive(Deserialize, Debug, Clone)]
@@ -422,12 +429,15 @@ pub struct LegalLinks {
 pub struct FeaturesAdvanced {
     #[serde(default)]
     pub process_message_delay_limit: u16,
+    #[serde(default)]
+    pub seen_events_cache_size: u32,
 }
 
 impl Default for FeaturesAdvanced {
     fn default() -> Self {
         Self {
             process_message_delay_limit: 5,
+            seen_events_cache_size: 20,
         }
     }
 }

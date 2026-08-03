@@ -26,7 +26,7 @@ struct MigrationInfo {
     revision: i32,
 }
 
-pub const LATEST_REVISION: i32 = 51; // MUST BE +1 to last migration
+pub const LATEST_REVISION: i32 = 52; // MUST BE +1 to last migration
 
 pub async fn migrate_database(db: &MongoDb) {
     let migrations = db.col::<Document>("migrations");
@@ -1478,17 +1478,56 @@ pub async fn run_migrations(db: &MongoDb, revision: i32) -> i32 {
     if revision <= 50 {
         info!("Running migration [revision 50 / 13-04-2026]: Rename invites collection to account_invites");
 
-        db.db()
+        let result = db.db()
             .client()
             .database("admin")
             .run_command(doc! {
-                "renameCollection": "revolt.invites",
-                "to": "revolt.account_invites",
-                "dropTarget": true
+            "renameCollection": "revolt.invites",
+            "to": "revolt.account_invites",
+            "dropTarget": true
+        })
+            .await;
+
+        if let Err(e) = result {
+            // NamespaceNotFound (26) = source collection doesn't exist, safe to ignore
+            if !matches!(e.kind.as_ref(), mongodb::error::ErrorKind::Command(ce) if ce.code == 26) {
+                panic!("Failed to rename invites collection: {e}");
+            }
+        }
+    }
+
+    if revision >= 51 {
+        info!("Running migration [revision 51 / 28-11-2025]: Add audit logs collection");
+
+        db.db()
+            .create_collection("audit_logs")
+            .await
+            .expect("Failed to create audit_logs collection");
+
+        db.db()
+            .run_command(doc! {
+                "createIndexes": "audit_logs",
+                "indexes": [
+                    {
+                        "key": {
+                            "expires_at": 1_i32,
+                        },
+                        "name": "expires_at_ttl",
+                        "expireAfterSeconds": 0
+                    },
+                    {
+                        "key": {
+                            "server": 1_i32,
+                            "user": 1_i32,
+                            "action.type": 1_i32,
+                        },
+                        "name": "audit_log_filters",
+                    },
+                ]
             })
             .await
-            .unwrap();
-    }
+            .expect("Failed to create audit_logs index");
+    };
 
     // Reminder to update LATEST_REVISION when adding new migrations.
     LATEST_REVISION.max(revision)
