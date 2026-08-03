@@ -542,7 +542,7 @@ impl User {
     pub async fn add_friend(
         &mut self,
         db: &Database,
-        amqp: Option<&AMQP>,
+        amqp: &AMQP,
         target: &mut User,
     ) -> Result<()> {
         match self.relationship_with(&target.id) {
@@ -552,10 +552,8 @@ impl User {
             RelationshipStatus::Blocked => Err(create_error!(Blocked)),
             RelationshipStatus::BlockedOther => Err(create_error!(BlockedByOther)),
             RelationshipStatus::Incoming => {
-                if let Some(amqp) = amqp {
-                    // Accept incoming friend request
-                    _ = amqp.friend_request_accepted(self, target).await;
-                };
+                // Accept incoming friend request
+                _ = amqp.friend_request_accepted(self, target).await;
 
                 self.apply_relationship(
                     db,
@@ -585,9 +583,7 @@ impl User {
                     }));
                 }
 
-                if let Some(amqp) = amqp {
-                    _ = amqp.friend_request_received(target, self).await;
-                };
+                _ = amqp.friend_request_received(target, self).await;
 
                 // Send the friend request
                 self.apply_relationship(
