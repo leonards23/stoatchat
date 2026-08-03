@@ -387,7 +387,6 @@ pub enum EventV1 {
 impl EventV1 {
     /// Publish helper wrapper
     pub async fn p(self, channel: String) {
-        //redis_kiss::p(channel.clone(), &self).await;
         #[cfg(debug_assertions)]
         info!("Publishing event to {channel}: {self:?}");
 
@@ -400,19 +399,17 @@ impl EventV1 {
         };
     }
 
-    /// Publish user event
-    pub async fn p_user(self, id: String, db: &Database) {
-        self.clone().p(id.clone()).await;
-    }
+    pub async fn p_broadcast(self, channels: Vec<String>) {
+        #[cfg(debug_assertions)]
+        info!("Broadcasting event to channels: {channels:?}: {self:?}");
 
-    /// Publish private event
-    pub async fn private(self, id: String) {
-        self.p(format!("{id}")).await;
-    }
-
-    /// Publish server member event
-    pub async fn server(self, id: String) {
-        self.p(format!("{id}")).await;
+        if let Err(e) = get_amqp().publish_event_broadcast(channels, &self).await {
+            if cfg!(debug_assertions) {
+                panic!("{e:?}");
+            } else {
+                log::error!("{e:?}");
+            };
+        };
     }
 
     /// Publish internal global event

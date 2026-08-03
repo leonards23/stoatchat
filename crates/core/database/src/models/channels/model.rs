@@ -295,10 +295,9 @@ impl Channel {
 
         db.insert_channel(&channel).await?;
 
-        let event = EventV1::ChannelCreate(channel.clone().into());
-        for recipient in recipients {
-            event.clone().private(recipient).await;
-        }
+        EventV1::ChannelCreate(channel.clone().into())
+            .p_broadcast(recipients)
+            .await;
 
         Ok(channel)
     }
@@ -328,9 +327,9 @@ impl Channel {
             db.insert_channel(&channel).await?;
 
             if let Channel::DirectMessage { .. } = &channel {
-                let event = EventV1::ChannelCreate(channel.clone().into());
-                event.clone().private(user_a.id.clone()).await;
-                event.private(user_b.id.clone()).await;
+                EventV1::ChannelCreate(channel.clone().into())
+                    .p_broadcast(vec![user_a.id.clone(), user_b.id.clone()])
+                    .await;
             };
 
             Ok(channel)
@@ -392,7 +391,7 @@ impl Channel {
                 .ok();
 
                 EventV1::ChannelCreate(self.clone().into())
-                    .private(user.id.to_string())
+                    .p(user.id.to_string())
                     .await;
 
                 Ok(())
@@ -556,7 +555,7 @@ impl Channel {
                     slowmode.take();
                 }
                 _ => {}
-            }
+            },
         }
     }
 
@@ -774,7 +773,7 @@ impl Channel {
             user: user.to_string(),
             message_id: message.to_string(),
         }
-        .private(user.to_string())
+        .p(user.to_string())
         .await;
 
         crate::util::acker::ack_channel(user, self.id(), message, amqp).await

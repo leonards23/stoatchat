@@ -413,4 +413,36 @@ impl AMQP {
 
         Ok(())
     }
+
+    pub async fn publish_event_broadcast(
+        &self,
+        channels: Vec<String>,
+        event: &EventV1,
+    ) -> Result<(), AMQPError> {
+        let mut headers = FieldTable::default();
+        headers.insert(
+            "c".into(),
+            AMQPValue::FieldArray(
+                channels
+                    .into_iter()
+                    .map(|c| AMQPValue::LongString(c.into()))
+                    .collect::<Vec<_>>()
+                    .into(),
+            ),
+        );
+
+        let config = config().await;
+
+        self.publish_event
+            .basic_publish(
+                config.rabbit.default_exchange.clone().into(),
+                config.rabbit.queues.events.into(),
+                BasicPublishOptions::default(),
+                &serde_json::to_vec(event).unwrap(),
+                BasicProperties::default().with_headers(headers),
+            )
+            .await?;
+
+        Ok(())
+    }
 }
