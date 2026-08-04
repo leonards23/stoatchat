@@ -109,6 +109,9 @@ auto_derived_partial!(
         /// Role icon
         #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
         pub icon: Option<File>,
+        /// Id of the bot that owns this role, if it is a managed role
+        #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
+        pub owner: Option<String>
     },
     "PartialRole"
 );
@@ -127,6 +130,7 @@ auto_derived!(
     pub enum FieldsRole {
         Colour,
         Icon,
+        Owner,
     }
 
     /// Channel category

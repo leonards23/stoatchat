@@ -184,6 +184,7 @@ impl IntoDocumentPath for FieldsRole {
         Some(match self {
             FieldsRole::Colour => "colour",
             FieldsRole::Icon => "icon",
+            FieldsRole::Owner => "owner",
         })
     }
 }
