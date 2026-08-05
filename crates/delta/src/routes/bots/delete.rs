@@ -1,7 +1,7 @@
 use revolt_database::{
     util::reference::Reference,
     voice::{remove_user_from_voice_channels, VoiceClient},
-    Database, User,
+    Database, User, RemovalIntention,
 };
 use revolt_result::{create_error, Result};
 use rocket::State;
@@ -21,6 +21,16 @@ pub async fn delete_bot(
     let bot = bot_id.as_bot(db).await?;
     if bot.owner != user.id {
         return Err(create_error!(NotFound));
+    }
+
+    for member in db.fetch_all_memberships(&bot.id).await? {
+        let server = db.fetch_server(&member.id.server).await?;
+
+        member
+            .remove(db, &server, RemovalIntention::Leave, true)
+            .await?;
+
+        server.cleanup_managed_bot_role(db, &bot.id).await?;
     }
 
     bot.delete(db).await?;
