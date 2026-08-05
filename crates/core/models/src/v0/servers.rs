@@ -130,7 +130,6 @@ auto_derived!(
     pub enum FieldsRole {
         Colour,
         Icon,
-        Owner,
     }
 
     /// Channel category

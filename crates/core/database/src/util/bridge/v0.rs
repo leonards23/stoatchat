@@ -991,7 +991,6 @@ impl From<crate::FieldsRole> for FieldsRole {
         match value {
             crate::FieldsRole::Colour => FieldsRole::Colour,
             crate::FieldsRole::Icon => FieldsRole::Icon,
-            crate::FieldsRole::Owner => FieldsRole::Owner,
         }
     }
 }
@@ -1001,7 +1000,6 @@ impl From<FieldsRole> for crate::FieldsRole {
         match value {
             FieldsRole::Colour => crate::FieldsRole::Colour,
             FieldsRole::Icon => crate::FieldsRole::Icon,
-            FieldsRole::Owner => crate::FieldsRole::Owner,
         }
     }
 }

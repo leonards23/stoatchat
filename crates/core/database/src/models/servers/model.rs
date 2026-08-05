@@ -140,7 +140,6 @@ auto_derived!(
     pub enum FieldsRole {
         Colour,
         Icon,
-        Owner,
     }
 );
 
@@ -446,7 +445,6 @@ impl Role {
         match field {
             FieldsRole::Colour => self.colour = None,
             FieldsRole::Icon => self.icon = None,
-            FieldsRole::Owner => self.owner = None,
         }
     }
 
@@ -463,7 +461,6 @@ impl Role {
                 hoist,
                 rank,
                 (FieldsRole::Icon) icon,
-                (FieldsRole::Owner) owner,
             )
         );
 
