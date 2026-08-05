@@ -14,6 +14,9 @@ use rocket_empty::EmptyResponse;
 
 use crate::util::audit_log_reason::AuditLogReason;
 
+/// # Invite Bot
+///
+/// Invite a bot to a server or group by its id.`
 #[openapi(tag = "Bots")]
 #[post("/<target>/invite?<permissions>", data = "<dest>")]
 pub async fn invite_bot(
