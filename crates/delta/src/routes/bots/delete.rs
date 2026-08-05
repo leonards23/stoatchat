@@ -23,16 +23,6 @@ pub async fn delete_bot(
         return Err(create_error!(NotFound));
     }
 
-    for member in db.fetch_all_memberships(&bot.id).await? {
-        let server = db.fetch_server(&member.id.server).await?;
-
-        member
-            .remove(db, &server, RemovalIntention::Leave, true)
-            .await?;
-
-        server.cleanup_managed_bot_role(db, &bot.id).await?;
-    }
-
     bot.delete(db).await?;
 
     remove_user_from_voice_channels(voice_client, &bot.id).await?;

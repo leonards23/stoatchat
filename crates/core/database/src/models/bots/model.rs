@@ -1,7 +1,7 @@
 use revolt_result::Result;
 use ulid::Ulid;
 
-use crate::{events::client::EventV1, BotInformation, Database, PartialUser, User};
+use crate::{events::client::EventV1, BotInformation, Database, PartialUser, RemovalIntention, User};
 
 auto_derived_partial!(
     /// Bot
@@ -159,6 +159,16 @@ impl Bot {
 
     /// Delete this bot
     pub async fn delete(&self, db: &Database) -> Result<()> {
+        for member in db.fetch_all_memberships(&self.id).await? {
+            let server = db.fetch_server(&member.id.server).await?;
+
+            member
+                .remove(db, &server, RemovalIntention::Leave, true)
+                .await?;
+
+            server.cleanup_managed_bot_role(db, &self.id).await?;
+        }
+        
         db.fetch_user(&self.id).await?.mark_deleted(db).await?;
         db.delete_bot(&self.id).await
     }
