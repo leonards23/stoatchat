@@ -406,7 +406,7 @@ impl AMQP {
                 config.rabbit.default_exchange.clone().into(),
                 config.rabbit.queues.events.into(),
                 BasicPublishOptions::default(),
-                &serde_json::to_vec(event).unwrap(),
+                &erltf_serde::to_bytes(event).unwrap(),
                 BasicProperties::default().with_headers(headers),
             )
             .await?;
@@ -438,7 +438,7 @@ impl AMQP {
                 config.rabbit.default_exchange.clone().into(),
                 config.rabbit.queues.events.into(),
                 BasicPublishOptions::default(),
-                &serde_json::to_vec(event).unwrap(),
+                &erltf_serde::to_bytes(event).unwrap(),
                 BasicProperties::default().with_headers(headers),
             )
             .await?;
