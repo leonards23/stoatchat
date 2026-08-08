@@ -25,7 +25,8 @@ pub async fn create_website_embed(original_url: &str, document: &str) -> Option<
                 node.attr("property").or_else(|| node.attr("name")),
                 node.attr("content"),
             ) {
-                meta.insert(property.to_string(), content.to_string());
+                meta.entry(property.to_string())
+                    .or_insert(content.to_string());
             }
         }
 
