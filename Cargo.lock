@@ -7679,7 +7679,7 @@ dependencies = [
 
 [[package]]
 name = "revolt-search"
-version = "0.13.7"
+version = "0.15.0"
 dependencies = [
  "elasticsearch",
  "elasticsearch-dsl",
@@ -7696,7 +7696,7 @@ dependencies = [
 
 [[package]]
 name = "revolt-searchd"
-version = "0.13.7"
+version = "0.15.0"
 dependencies = [
  "anyhow",
  "async-trait",

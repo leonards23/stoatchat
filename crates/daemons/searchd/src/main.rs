@@ -8,7 +8,7 @@ use revolt_config::{Settings, config, configure};
 use revolt_database::{Database, DatabaseInfo, amqp::consumer::{Consumer, Delegate}};
 use revolt_search::ElasticsearchClient;
 use tokio::{signal::ctrl_c, spawn};
-use std::{marker::PhantomData, sync::Arc};
+use std::sync::Arc;
 
 mod consumers;
 mod index;
@@ -140,7 +140,7 @@ async fn make_queue_and_consume<F: Consumer<ElasticsearchClient>>(
         .expect("Failed to declare exchange");
 
     let mut table = FieldTable::default();
-    table.insert("x-queue-type".try_into().unwrap(), AMQPValue::LongString("quorum".into()));
+    table.insert("x-queue-type".into(), AMQPValue::LongString("quorum".into()));
 
     let args = QueueDeclareOptions {
         durable: true,

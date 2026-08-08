@@ -19,6 +19,8 @@ pub use elasticsearch;
 
 use crate::{AuthorType, MessageComponent, SearchTerms};
 
+const MESSAGES_INDEX: &str = "messages";
+
 /// Elasticsearch errors
 #[derive(Debug)]
 pub enum Error {
@@ -73,7 +75,7 @@ impl ElasticsearchClient {
         let exception = self
             .inner
             .indices()
-            .delete(IndicesDeleteParts::Index(&["messages"]))
+            .delete(IndicesDeleteParts::Index(&[MESSAGES_INDEX]))
             .send()
             .await?
             .exception()
@@ -91,7 +93,7 @@ impl ElasticsearchClient {
         let exception = self
             .inner
             .indices()
-            .create(IndicesCreateParts::Index("messages"))
+            .create(IndicesCreateParts::Index(MESSAGES_INDEX))
             .body(json!({
                 "mappings": {
                     "properties": {
@@ -197,7 +199,7 @@ impl ElasticsearchClient {
 
         let response = self
             .inner
-            .search(SearchParts::Index(&["messages"]))
+            .search(SearchParts::Index(&[MESSAGES_INDEX]))
             .stored_fields(&[])
             .body(search)
             .size(terms.limit.unwrap_or(100) as i64)
@@ -310,7 +312,7 @@ impl ElasticsearchClient {
 
         let exception = self
             .inner
-            .bulk(BulkParts::Index("messages"))
+            .bulk(BulkParts::Index(MESSAGES_INDEX))
             .body(ops)
             .send()
             .await?
@@ -336,7 +338,7 @@ impl ElasticsearchClient {
 
         let exception = self
             .inner
-            .create(CreateParts::IndexId("messages", &id))
+            .create(CreateParts::IndexId(MESSAGES_INDEX, &id))
             .body(source)
             .send()
             .await?
@@ -362,7 +364,7 @@ impl ElasticsearchClient {
 
         let exception = self
             .inner
-            .index(IndexParts::IndexId("messages", &id))
+            .index(IndexParts::IndexId(MESSAGES_INDEX, &id))
             .body(source)
             .send()
             .await?
@@ -380,7 +382,7 @@ impl ElasticsearchClient {
     pub async fn delete_message(&self, message_id: &str) -> Result<(), Error> {
         let exception = self
             .inner
-            .delete(DeleteParts::IndexId("messages", message_id))
+            .delete(DeleteParts::IndexId(MESSAGES_INDEX, message_id))
             .send()
             .await?
             .exception()
@@ -397,7 +399,7 @@ impl ElasticsearchClient {
     pub async fn delete_channel(&self, channel_id: &str) -> Result<(), Error> {
         let exception = self
             .inner
-            .delete_by_query(DeleteByQueryParts::Index(&["messages"]))
+            .delete_by_query(DeleteByQueryParts::Index(&[MESSAGES_INDEX]))
             .body(Search::new().query(Query::term("channel", channel_id)))
             .send()
             .await?
