@@ -1,7 +1,7 @@
 use revolt_database::{
     util::reference::Reference,
     voice::{remove_user_from_voice_channels, VoiceClient},
-    Database, User, RemovalIntention,
+    Database, User,
 };
 use revolt_result::{create_error, Result};
 use rocket::State;
