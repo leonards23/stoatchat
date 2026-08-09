@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.15.1](https://github.com/stoatchat/stoatchat/compare/v0.15.0...v0.15.1) (2026-08-07)
+
+
+### Features
+
+* moderation API for pulling reported images. ([#880](https://github.com/stoatchat/stoatchat/issues/880)) ([fe331f0](https://github.com/stoatchat/stoatchat/commit/fe331f0dcb1704e0bb99a42f89bd8bfe263069d2))
+
+
+### Bug Fixes
+
+* Give first instance of a meta tag preference when creating website embed. ([4feeeb1](https://github.com/stoatchat/stoatchat/commit/4feeeb11f316a8ace0f3029424585c541e3310f6))
+* Prefer first instance of a meta property in create_website_embed ([#895](https://github.com/stoatchat/stoatchat/issues/895)) ([4feeeb1](https://github.com/stoatchat/stoatchat/commit/4feeeb11f316a8ace0f3029424585c541e3310f6))
+
+## [0.15.0](https://github.com/stoatchat/stoatchat/compare/v0.14.3...v0.15.0) (2026-08-05)
+
+
+### Features
+
+* add an approximate member count to servers ([#884](https://github.com/stoatchat/stoatchat/issues/884)) ([ccfb5f1](https://github.com/stoatchat/stoatchat/commit/ccfb5f1a62f1be9177ac9c1c09fd18ea8e9c7f18))
+* add call event ([#873](https://github.com/stoatchat/stoatchat/issues/873)) ([457c770](https://github.com/stoatchat/stoatchat/commit/457c7709c75060cd8519cc45df3badcfc1b629ea))
+
+
+### Bug Fixes
+
+* rewrite youtube embedder to use youtube oembed ([#878](https://github.com/stoatchat/stoatchat/issues/878)) ([0369451](https://github.com/stoatchat/stoatchat/commit/03694512b90be90367299c3ebfb072ebbc8a681d))
+
 ## [0.14.3](https://github.com/stoatchat/stoatchat/compare/v0.14.2...v0.14.3) (2026-07-22)
 
 
