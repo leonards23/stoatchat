@@ -548,8 +548,8 @@ impl Message {
                     .collect();
 
                 if !foreign.is_empty() {
-                    if let MessageAuthor::User(user) = &author {
-                        let owned_user: User = (*user).clone().into();
+                    if let MessageAuthor::User(user) = author {
+                        let owned_user: User = user.clone().into();
                         let mut query = DatabasePermissionQuery::new(db, &owned_user).channel(&channel);
                         let perms = calculate_channel_permissions(&mut query).await;
 
