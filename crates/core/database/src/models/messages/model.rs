@@ -536,7 +536,7 @@ impl Message {
                 let emoji_ids: Vec<String> = emojis.iter().cloned().collect();
                 let resolved = db.fetch_emojis(&emoji_ids).await.map_err(|e| {
                     revolt_config::capture_error(&e);
-                    create_error!(InternalError)
+                    create_database_error!("find", "emojis")
                 })?;
 
                 let foreign: Vec<&Emoji> = resolved
