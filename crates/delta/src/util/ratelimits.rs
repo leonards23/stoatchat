@@ -54,10 +54,10 @@ impl<'a> RatelimitResolver<Request<'a>> for DeltaRatelimits {
                 ("swagger", _, _) => ("swagger", None),
                 ("safety", Some("report"), _) => ("safety_report", Some("report")),
                 ("safety", _, _) => ("safety", None),
-                _ => ("any", None),
+                _ => ("any_dlta", None),
             }
         } else {
-            ("any", None)
+            ("any_dlta", None)
         }
     }
 
