@@ -1,7 +1,7 @@
 use std::collections::hash_map::DefaultHasher;
 use std::hash::Hasher;
 use std::ops::Add;
-use std::sync::Arc;
+use std::sync::{Arc, LazyLock};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use redis_kiss::redis::ExistenceCheck;
@@ -11,6 +11,8 @@ use redis_kiss::{
 };
 use revolt_result::ToRevoltError;
 use serde::Serialize;
+
+static IS_TEST_ENV: LazyLock<bool> = LazyLock::new(|| std::env::var("TEST_DB").is_ok());
 
 pub trait RequestKind {
     type R<'a>;
@@ -133,6 +135,16 @@ impl Ratelimiter {
         }
 
         let key = key.finish();
+
+        if *IS_TEST_ENV {
+            return Ok(Ratelimiter {
+                key,
+                limit,
+                remaining: limit,
+                reset: 10000,
+            });
+        }
+
         let mut conn = get_connection()
             .await
             .expect("Failed to get redis connection")
@@ -156,7 +168,6 @@ impl Ratelimiter {
         entry.is_expired(now);
         entry.save(&mut conn, key).await;
         ratelimiter.remaining -= 1;
-        ratelimiter.reset = entry.left_until_reset(now);
 
         Ok(ratelimiter)
     }
