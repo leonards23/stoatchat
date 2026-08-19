@@ -4,7 +4,7 @@ use futures::lock::Mutex;
 
 use crate::{
     Account, AccountInvite, AuditLogEntry, Bot, Channel, ChannelCompositeKey, ChannelUnread, Emoji,
-    File, FileHash, Invite, MFATicket, Member, MemberCompositeKey, Message, PolicyChange,
+    Feedback, File, FileHash, Invite, MFATicket, Member, MemberCompositeKey, Message, PolicyChange,
     RatelimitEvent, Report, Server, ServerBan, Session, Snapshot, User, UserSettings, Webhook,
 };
 
@@ -21,6 +21,7 @@ database_derived!(
         pub emojis: Arc<Mutex<HashMap<String, Emoji>>>,
         pub file_hashes: Arc<Mutex<HashMap<String, FileHash>>>,
         pub files: Arc<Mutex<HashMap<String, File>>>,
+        pub feedback: Arc<Mutex<HashMap<String, Feedback>>>,
         pub messages: Arc<Mutex<HashMap<String, Message>>>,
         pub policy_changes: Arc<Mutex<HashMap<String, PolicyChange>>>,
         pub ratelimit_events: Arc<Mutex<HashMap<String, RatelimitEvent>>>,
