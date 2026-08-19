@@ -10,8 +10,9 @@ use rocket::{serde::json::Json, State};
 /// # Feedback Data
 #[derive(Validate, Deserialize, JsonSchema)]
 pub struct DataSubmitFeedback {
-    /// Category of the feedback
-    category: FeedbackCategory,
+    /// Category of the feedback: "Bug", "Suggestion", "Question" or "Other"
+    #[validate(length(min = 1, max = 32))]
+    category: String,
     /// Feedback content
     #[validate(length(min = 1, max = 2000))]
     content: String,
@@ -47,11 +48,18 @@ pub async fn submit(
         return Err(create_error!(IsBot));
     }
 
+    let category = match data.category.as_str() {
+        "Bug" => FeedbackCategory::Bug,
+        "Suggestion" => FeedbackCategory::Suggestion,
+        "Question" => FeedbackCategory::Question,
+        _ => FeedbackCategory::Other,
+    };
+
     let feedback = Feedback {
         id: Ulid::new().to_string(),
         author_id: user.id.clone(),
         author_username: user.username.clone(),
-        category: data.category,
+        category,
         content: data.content,
         page_url: data.page_url,
         user_agent: data.user_agent,
